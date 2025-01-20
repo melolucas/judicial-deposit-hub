@@ -2,9 +2,28 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simulando login com usuário de teste
+    const email = (e.currentTarget as HTMLFormElement).email.value;
+    const password = (e.currentTarget as HTMLFormElement).password.value;
+
+    // Credenciais de teste
+    if (email === "usuario@teste.com" && password === "123456") {
+      toast.success("Login realizado com sucesso!");
+      navigate("/");
+    } else {
+      toast.error("Credenciais inválidas!");
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md p-8 animate-fade-in">
@@ -13,26 +32,36 @@ const Login = () => {
           <p className="text-gray-600">Faça login para acessar sua conta</p>
         </div>
         
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="seu@email.com" />
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="seu@email.com"
+              defaultValue="usuario@teste.com"
+            />
           </div>
           
           <div className="space-y-2">
             <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="password" placeholder="••••••••" />
+            <Input 
+              id="password" 
+              type="password" 
+              placeholder="••••••••"
+              defaultValue="123456"
+            />
           </div>
 
-          <Button className="w-full btn-primary">
+          <Button type="submit" className="w-full btn-primary">
             Entrar
           </Button>
         </form>
 
         <div className="mt-6 text-center text-sm">
-          <Link to="/forgot-password" className="text-secondary hover:underline">
+          <a href="#" className="text-secondary hover:underline">
             Esqueceu sua senha?
-          </Link>
+          </a>
         </div>
       </Card>
     </div>
