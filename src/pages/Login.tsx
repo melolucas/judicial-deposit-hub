@@ -17,7 +17,7 @@ const Login = () => {
 
     if (email === "usuario@teste.com" && password === "123456") {
       toast.success("Login realizado com sucesso!");
-      navigate("/");
+      navigate("/dashboard");
     } else {
       toast.error("Credenciais inválidas!");
     }
@@ -29,7 +29,7 @@ const Login = () => {
     // Simulando redirecionamento após 2 segundos
     setTimeout(() => {
       toast.success("Login com GOV.br realizado com sucesso!");
-      navigate("/");
+      navigate("/dashboard");
     }, 2000);
   };
 
