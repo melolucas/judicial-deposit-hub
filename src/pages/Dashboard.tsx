@@ -35,7 +35,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Mock data for the chart
 const data = [
   { name: "Jan", valor: 4000 },
   { name: "Fev", valor: 3000 },
@@ -45,45 +44,50 @@ const data = [
   { name: "Jun", valor: 2390 },
 ];
 
-const menuItems = [
-  {
-    title: "Início",
-    icon: Home,
-    url: "/dashboard",
-  },
-  {
-    title: "Depósitos",
-    icon: Grid,
-    url: "#depositos",
-  },
-  {
-    title: "Extratos",
-    icon: List,
-    url: "#extratos",
-  },
-  {
-    title: "Documentos",
-    icon: FileText,
-    url: "#documentos",
-  },
-  {
-    title: "Usuários",
-    icon: Users,
-    url: "#usuarios",
-  },
-  {
-    title: "Configurações",
-    icon: Settings,
-    url: "#configuracoes",
-  },
-];
-
 const Dashboard = () => {
   const navigate = useNavigate();
+
+  const menuItems = [
+    {
+      title: "Início",
+      icon: Home,
+      path: "/dashboard",
+    },
+    {
+      title: "Depósitos",
+      icon: Grid,
+      path: "/dashboard/depositos",
+    },
+    {
+      title: "Extratos",
+      icon: List,
+      path: "/dashboard/extratos",
+    },
+    {
+      title: "Documentos",
+      icon: FileText,
+      path: "/dashboard/documentos",
+    },
+    {
+      title: "Usuários",
+      icon: Users,
+      path: "/dashboard/usuarios",
+    },
+    {
+      title: "Configurações",
+      icon: Settings,
+      path: "/dashboard/configuracoes",
+    },
+  ];
 
   const handleLogout = () => {
     toast.success("Logout realizado com sucesso!");
     navigate("/login");
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    toast.info("Funcionalidade em desenvolvimento");
   };
 
   return (
@@ -97,11 +101,11 @@ const Dashboard = () => {
                 <SidebarMenu>
                   {menuItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <a href={item.url} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </a>
+                      <SidebarMenuButton 
+                        onClick={() => handleNavigation(item.path)}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
