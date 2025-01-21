@@ -14,8 +14,10 @@ import {
 import {
   BarChart3,
   FileText,
+  Grid,
   Home,
   LayoutDashboard,
+  List,
   LogOut,
   Receipt,
   Settings,
@@ -51,12 +53,12 @@ const menuItems = [
   },
   {
     title: "Depósitos",
-    icon: BarChart3,
+    icon: Grid,
     url: "#depositos",
   },
   {
     title: "Extratos",
-    icon: Receipt,
+    icon: List,
     url: "#extratos",
   },
   {
