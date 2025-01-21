@@ -23,25 +23,17 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { UserProfile } from "@/components/UserProfile";
+import { QuickActions } from "@/components/QuickActions";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-
-// Mock data for the chart
-const data = [
-  { name: "Jan", valor: 4000 },
-  { name: "Fev", valor: 3000 },
-  { name: "Mar", valor: 2000 },
-  { name: "Abr", valor: 2780 },
-  { name: "Mai", valor: 1890 },
-  { name: "Jun", valor: 2390 },
-];
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   {
@@ -65,6 +57,11 @@ const menuItems = [
     url: "#documentos",
   },
   {
+    title: "Contratos",
+    icon: FileText,
+    url: "/contracts",
+  },
+  {
     title: "Usuários",
     icon: Users,
     url: "#usuarios",
@@ -76,6 +73,58 @@ const menuItems = [
   },
 ];
 
+const depositsData = [
+  {
+    processo: "123456",
+    conta: "7890",
+    agencia: "1234",
+    tipo: "Voluntário",
+    guia: "Sim",
+    data: "01/01/2025",
+    origem: "Origem1",
+    autor: "Autor1",
+    reu: "Réu1",
+    advogado: "Advogado1",
+    cpfCnpj: "123.456.789-00",
+    depositante: "Nome1",
+    valor: "R$ 1.000,00",
+  },
+  {
+    processo: "654321",
+    conta: "0987",
+    agencia: "4321",
+    tipo: "Consignado",
+    guia: "Não",
+    data: "02/01/2025",
+    origem: "Origem2",
+    autor: "Autor2",
+    reu: "Réu2",
+    advogado: "Advogado2",
+    cpfCnpj: "987.654.321-00",
+    depositante: "Nome2",
+    valor: "R$ 2.000,00",
+  },
+];
+
+const extractData = [
+  {
+    processo: "123456",
+    conta: "7890",
+    agencia: "1234",
+    data: "01/01/2025",
+    valor: "R$ 1.000,00",
+    juros: "R$ 50,00",
+  },
+  {
+    processo: "654321",
+    conta: "0987",
+    agencia: "4321",
+    data: "02/01/2025",
+    valor: "R$ 2.000,00",
+    juros: "R$ 100,00",
+  },
+];
+
 const Dashboard = () => {
   const navigate = useNavigate();
 
@@ -84,27 +133,49 @@ const Dashboard = () => {
     navigate("/login");
   };
 
+  const handleGenerateGuide = (processo: string) => {
+    toast.success(`Gerando guia para o processo ${processo}`);
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <Sidebar>
           <SidebarContent>
+            <UserProfile />
             <SidebarGroup>
               <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {menuItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <a href={item.url} className="flex items-center gap-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </a>
+                      <SidebarMenuButton
+                        asChild={item.url.startsWith("/")}
+                        onClick={
+                          item.url.startsWith("/")
+                            ? () => navigate(item.url)
+                            : undefined
+                        }
+                      >
+                        {item.url.startsWith("/") ? (
+                          <button className="flex items-center gap-2">
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.title}</span>
+                          </button>
+                        ) : (
+                          <a href={item.url} className="flex items-center gap-2">
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.title}</span>
+                          </a>
+                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleLogout} className="text-red-500">
+                    <SidebarMenuButton
+                      onClick={handleLogout}
+                      className="text-red-500"
+                    >
                       <LogOut className="h-4 w-4" />
                       <span>Sair</span>
                     </SidebarMenuButton>
@@ -126,84 +197,95 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <Card className="p-6">
-              <h3 className="font-semibold mb-2">Total de Depósitos</h3>
-              <p className="text-2xl font-bold">R$ 1.234.567,89</p>
-              <p className="text-sm text-muted-foreground">+15% este mês</p>
-            </Card>
-            <Card className="p-6">
-              <h3 className="font-semibold mb-2">Processos Ativos</h3>
-              <p className="text-2xl font-bold">42</p>
-              <p className="text-sm text-muted-foreground">3 novos esta semana</p>
-            </Card>
-            <Card className="p-6">
-              <h3 className="font-semibold mb-2">Alvarás Pendentes</h3>
-              <p className="text-2xl font-bold">7</p>
-              <p className="text-sm text-muted-foreground">2 aguardando aprovação</p>
-            </Card>
-          </div>
+          <QuickActions />
 
-          <Card className="p-6 mb-6">
-            <h3 className="font-semibold mb-4">Evolução de Depósitos</h3>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="valor"
-                    stroke="#1351B4"
-                    fill="#1351B4"
-                    fillOpacity={0.2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+          <Card className="mb-6">
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Depósitos Judiciais</h2>
+              <ScrollArea className="h-[400px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Processo</TableHead>
+                      <TableHead>Conta</TableHead>
+                      <TableHead>Agência</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Guia</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Origem</TableHead>
+                      <TableHead>Autor</TableHead>
+                      <TableHead>Réu</TableHead>
+                      <TableHead>Advogado</TableHead>
+                      <TableHead>CPF/CNPJ</TableHead>
+                      <TableHead>Depositante</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {depositsData.map((deposit) => (
+                      <TableRow key={deposit.processo}>
+                        <TableCell>{deposit.processo}</TableCell>
+                        <TableCell>{deposit.conta}</TableCell>
+                        <TableCell>{deposit.agencia}</TableCell>
+                        <TableCell>{deposit.tipo}</TableCell>
+                        <TableCell>{deposit.guia}</TableCell>
+                        <TableCell>{deposit.data}</TableCell>
+                        <TableCell>{deposit.origem}</TableCell>
+                        <TableCell>{deposit.autor}</TableCell>
+                        <TableCell>{deposit.reu}</TableCell>
+                        <TableCell>{deposit.advogado}</TableCell>
+                        <TableCell>{deposit.cpfCnpj}</TableCell>
+                        <TableCell>{deposit.depositante}</TableCell>
+                        <TableCell>{deposit.valor}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleGenerateGuide(deposit.processo)}
+                          >
+                            Gerar Guia
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
             </div>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4">Últimos Depósitos</h3>
-              <ScrollArea className="h-[200px]">
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Processo #{1000 + i}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Depositado em {new Date().toLocaleDateString()}
-                        </p>
-                      </div>
-                      <p className="font-semibold">R$ {(Math.random() * 10000).toFixed(2)}</p>
-                    </div>
-                  ))}
-                </div>
+          <Card>
+            <div className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Extrato</h2>
+              <ScrollArea className="h-[400px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Processo</TableHead>
+                      <TableHead>Conta</TableHead>
+                      <TableHead>Agência</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Juros e Correção</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {extractData.map((extract) => (
+                      <TableRow key={extract.processo}>
+                        <TableCell>{extract.processo}</TableCell>
+                        <TableCell>{extract.conta}</TableCell>
+                        <TableCell>{extract.agencia}</TableCell>
+                        <TableCell>{extract.data}</TableCell>
+                        <TableCell>{extract.valor}</TableCell>
+                        <TableCell>{extract.juros}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </ScrollArea>
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4">Próximos Vencimentos</h3>
-              <ScrollArea className="h-[200px]">
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">Alvará #{2000 + i}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Vence em {i} dias
-                        </p>
-                      </div>
-                      <p className="font-semibold text-yellow-600">Pendente</p>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </Card>
-          </div>
+            </div>
+          </Card>
         </main>
       </div>
     </SidebarProvider>
